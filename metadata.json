@@ -1,0 +1,8 @@
+{
+  "name": "Wyyrrddd",
+  "description": "High-tech Norse Web3 social saga. Tokenized impressions, Raven radar, and fate-weaving data monetization.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
