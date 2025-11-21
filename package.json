@@ -9,10 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.6",
+    "@google/genai": "^1.30.0",
+    "@polkadot/api": "^16.5.2",
+    "@polkadot/extension-dapp": "^0.62.5",
+    "@polkadot/util": "^13.5.8",
     "react": "^19.2.0",
-    "@google/genai": "^1.30.0"
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

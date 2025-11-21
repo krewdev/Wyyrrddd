@@ -2,9 +2,23 @@ import React from 'react';
 import { useWallet } from '../contexts/WalletContext';
 import { TokenType } from '../types';
 import { HeartIcon, LikeIcon, CareIcon, CreepIcon } from './Icons';
+import { WalletConnector } from './WalletConnector';
 
 export const Profile: React.FC = () => {
-  const { wallet, isSellingData, toggleSellingData, daoEarningsDot, dotPrice, tokenRates } = useWallet();
+  const {
+    wallet,
+    isSellingData,
+    toggleSellingData,
+    daoEarningsDot,
+    dotPrice,
+    tokenRates,
+    isWalletConnected,
+    connectedAccount,
+    api,
+    connectWallet,
+    disconnectWallet,
+    dotBalance
+  } = useWallet();
 
   // Calculate Total Net Worth in USD
   const tokenValueUsd = 
@@ -46,6 +60,22 @@ export const Profile: React.FC = () => {
                     </span>
                 </div>
             </div>
+        </div>
+
+        {/* Wallet Connection */}
+        <div className="mb-6">
+          <WalletConnector
+            onConnect={connectWallet}
+            onDisconnect={disconnectWallet}
+            isConnected={isWalletConnected}
+            currentAccount={connectedAccount}
+          />
+          {isWalletConnected && (
+            <div className="mt-3 p-3 bg-cyber-panel border border-cyber-cyan/30 rounded">
+              <div className="text-xs text-gray-400 font-mono mb-1">DOT Balance</div>
+              <div className="text-lg font-mono text-cyber-cyan font-bold">{dotBalance}</div>
+            </div>
+          )}
         </div>
 
         {/* Net Worth Card */}

@@ -146,7 +146,7 @@ export const Radar: React.FC = () => {
                     <h3 className="text-xl font-black text-white mb-1 tracking-tight">{foundTarget.brand}</h3>
                 )}
                 <p className="text-gray-300 text-sm leading-relaxed mb-6 font-mono">
-                    >> "{foundTarget.message}"
+                    &gt;&gt; "{foundTarget.message}"
                 </p>
                 
                 <div className="flex gap-3">

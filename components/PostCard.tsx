@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Post, TokenType } from '../types';
 import { CareIcon, CreepIcon, HeartIcon, LikeIcon, ShareIcon } from './Icons';
 import { useWallet } from '../contexts/WalletContext';
+import { TokenSpendEffect, SuccessEffect } from './ParticleSystem';
 
 interface PostCardProps {
   post: Post;
@@ -19,15 +20,27 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const { spendToken, earnToken, tokenRates } = useWallet();
   const [localTokens, setLocalTokens] = useState(post.tokens);
   const [animations, setAnimations] = useState<{ id: string; symbol: string; isPositive: boolean; cost?: number }[]>([]);
+  const [particleEffects, setParticleEffects] = useState<{ id: string; type: 'spend' | 'success'; position: { x: number; y: number } }[]>([]);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const handleInteraction = (type: TokenType) => {
+  const handleInteraction = (type: TokenType, event: React.MouseEvent) => {
     if (spendToken(type)) {
       const id = Math.random().toString(36).substr(2, 9);
       const symbol = RUNE_MAPPING[type];
       const cost = tokenRates[type];
-      
+
+      // Get button position for particle effect
+      const button = event.currentTarget as HTMLElement;
+      const rect = button.getBoundingClientRect();
+      const cardRect = cardRef.current?.getBoundingClientRect();
+      const position = {
+        x: rect.left + rect.width / 2 - (cardRect?.left || 0),
+        y: rect.top + rect.height / 2 - (cardRect?.top || 0)
+      };
+
       setAnimations(prev => [...prev, { id, symbol, isPositive: true, cost }]);
-      
+      setParticleEffects(prev => [...prev, { id, type: 'spend', position }]);
+
       setTimeout(() => {
         setLocalTokens(prev => ({
           ...prev,
@@ -37,20 +50,33 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
       setTimeout(() => {
         setAnimations(prev => prev.filter(a => a.id !== id));
+        setParticleEffects(prev => prev.filter(p => p.id !== id));
       }, 1000);
     } else {
       alert(`Insufficient ${type} credits!`);
     }
   };
 
-  const handleShare = async () => {
+  const handleShare = async (event: React.MouseEvent) => {
     earnToken(TokenType.CARE, 5);
 
     const id = Math.random().toString(36).substr(2, 9);
+
+    // Get button position for particle effect
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    const cardRect = cardRef.current?.getBoundingClientRect();
+    const position = {
+      x: rect.left + rect.width / 2 - (cardRect?.left || 0),
+      y: rect.top + rect.height / 2 - (cardRect?.top || 0)
+    };
+
     setAnimations(prev => [...prev, { id, symbol: 'ᛃ', isPositive: true }]);
+    setParticleEffects(prev => [...prev, { id, type: 'success', position }]);
 
     setTimeout(() => {
        setAnimations(prev => prev.filter(a => a.id !== id));
+       setParticleEffects(prev => prev.filter(p => p.id !== id));
     }, 1000);
 
     if (navigator.share) {
@@ -69,7 +95,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <div className="relative w-full bg-cyber-panel mb-8 group shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] tech-border-b">
+    <div ref={cardRef} className="relative w-full bg-cyber-panel mb-8 group shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] tech-border-b">
       
       {/* Decorative Frame Elements */}
       <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-cyber-cyan z-20"></div>
@@ -136,9 +162,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
               { type: TokenType.CARE, icon: CareIcon, color: 'text-cyber-yellow', borderColor: 'border-cyber-yellow/30', rune: RUNE_MAPPING[TokenType.CARE], label: 'CARE' },
               { type: TokenType.CREEP, icon: CreepIcon, color: 'text-purple-400', borderColor: 'border-purple-400/30', rune: RUNE_MAPPING[TokenType.CREEP], label: 'CREEP' }
           ].map((btn) => (
-            <button 
+            <button
                 key={btn.type}
-                onClick={() => handleInteraction(btn.type)}
+                onClick={(e) => handleInteraction(btn.type, e)}
                 className={`relative flex flex-col items-center justify-center p-2 bg-cyber-black border ${btn.borderColor} rounded-sm group/btn transition-all active:scale-95 hover:bg-white/5`}
             >
                 {/* Cost Tooltip */}
@@ -164,7 +190,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
           ))}
 
             {/* Share Button */}
-            <button 
+            <button
                 onClick={handleShare}
                 className="relative flex flex-col items-center justify-center p-2 bg-cyber-green/10 border border-cyber-green/30 rounded-sm group/btn hover:bg-cyber-green/20 transition-all"
             >
@@ -188,6 +214,17 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
             </button>
         </div>
       </div>
+
+      {/* Particle Effects */}
+      {particleEffects.map(effect => (
+        <div key={effect.id} className="absolute inset-0 pointer-events-none">
+          {effect.type === 'spend' ? (
+            <TokenSpendEffect trigger={true} position={effect.position} />
+          ) : (
+            <SuccessEffect trigger={true} position={effect.position} />
+          )}
+        </div>
+      ))}
     </div>
   );
 };
