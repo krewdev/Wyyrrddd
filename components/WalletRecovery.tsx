@@ -94,7 +94,7 @@ export const WalletRecovery: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row gap-2 mt-2">
           <a
-            href="https://support.polkadot.network/support/solutions/folders/65000148700"
+            href="https://docs.polkadot.com/develop/toolkit/integrations/wallets/"
             target="_blank"
             rel="noreferrer"
             className="flex-1 text-center px-3 py-2 text-[10px] border border-cyber-dim text-gray-300 hover:border-cyber-cyan hover:text-white transition-colors font-mono uppercase tracking-wide"

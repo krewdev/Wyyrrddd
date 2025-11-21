@@ -44,14 +44,23 @@ const App: React.FC = () => {
           {/* Background Grid */}
           <div className="fixed inset-0 bg-grid-pattern bg-[length:40px_40px] opacity-10 pointer-events-none"></div>
 
-          <div className="max-w-md mx-auto min-h-screen relative bg-cyber-dark/80 shadow-2xl border-x border-cyber-dim/30 backdrop-blur-sm">
-            <Routes>
-              <Route path="/" element={<Feed />} />
-              <Route path="/radar" element={<Radar />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/camera" element={<Camera />} />
-            </Routes>
-            <Navigation onShowTutorial={handleShowTutorial} />
+          <div className="max-w-md mx-auto min-h-screen relative bg-cyber-dark/80 shadow-2xl border-x border-cyber-dim/30 backdrop-blur-sm overflow-hidden">
+            {/* Global Algiz watermark behind every page */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04] select-none">
+              <span className="text-[220px] font-mono text-cyber-cyan">
+                ᛉ
+              </span>
+            </div>
+
+            <div className="relative z-10">
+              <Routes>
+                <Route path="/" element={<Feed />} />
+                <Route path="/radar" element={<Radar />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/camera" element={<Camera />} />
+              </Routes>
+              <Navigation onShowTutorial={handleShowTutorial} />
+            </div>
           </div>
 
           {/* Tutorial */}
