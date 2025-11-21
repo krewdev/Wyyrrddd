@@ -3,6 +3,8 @@ import { useWallet } from '../contexts/WalletContext';
 import { TokenType } from '../types';
 import { HeartIcon, LikeIcon, CareIcon, CreepIcon } from './Icons';
 import { WalletConnector } from './WalletConnector';
+import { TodoList } from './TodoList';
+import { WalletRecovery } from './WalletRecovery';
 
 export const Profile: React.FC = () => {
   const {
@@ -77,6 +79,9 @@ export const Profile: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Wallet Recovery Helper */}
+        <WalletRecovery />
 
         {/* Net Worth Card */}
         <div className="grid grid-cols-2 gap-4 mb-8">
@@ -159,6 +164,9 @@ export const Profile: React.FC = () => {
                 </div>
             </div>
         </div>
+
+        {/* ApplyPolkadot-1 roadmap todos */}
+        <TodoList />
     </div>
   );
 };
