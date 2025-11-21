@@ -1,12 +1,27 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Post, TokenType } from "../types";
 
-// Initialize the Gemini API client
-// Assuming process.env.API_KEY is available as per instructions
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize the Gemini API client safely (so missing key doesn't crash the app in browser)
+const apiKey = (process.env.API_KEY as string | undefined) || (process.env.GEMINI_API_KEY as string | undefined);
+
+let ai: GoogleGenAI | null = null;
+
+if (apiKey) {
+  ai = new GoogleGenAI({ apiKey });
+} else {
+  console.warn(
+    "[Wyyrrddd] Gemini API key not set; falling back to local/mock content. " +
+      "Set GEMINI_API_KEY in your environment if you want live AI content."
+  );
+}
 
 export const generateFeedContent = async (): Promise<Post[]> => {
   try {
+    // If no API client, immediately return fallback content
+    if (!ai) {
+      throw new Error("Gemini client not initialized");
+    }
+
     const model = "gemini-2.5-flash";
     const prompt = `
       Generate 5 realistic social media posts for a high-tech Web3 platform called "Wyyrrddd".
@@ -83,6 +98,10 @@ export const generateFeedContent = async (): Promise<Post[]> => {
 
 export const analyzeSurroundings = async (lat: number, lng: number): Promise<string> => {
   try {
+    if (!ai) {
+      throw new Error("Gemini client not initialized");
+    }
+
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `You are an ad server for a location-based app. 
