@@ -62,6 +62,13 @@ export const Navigation: React.FC<NavigationProps> = ({ onShowTutorial }) => {
             <UserIcon className="w-6 h-6" />
             <span className={`text-[10px] font-bold tracking-widest font-mono transition-all duration-300 ${location.pathname === '/profile' ? 'opacity-100' : 'opacity-0 -translate-y-2 absolute bottom-1'}`}>ID</span>
           </Link>
+
+          <div className="w-[1px] h-8 bg-cyber-dim/50"></div>
+
+          <Link to="/whitepaper" className={getLinkClass('/whitepaper')}>
+            <div className="w-6 h-6 flex items-center justify-center border border-current rounded-sm text-[10px] font-bold font-mono">WP</div>
+            <span className={`text-[10px] font-bold tracking-widest font-mono transition-all duration-300 ${location.pathname === '/whitepaper' ? 'opacity-100' : 'opacity-0 -translate-y-2 absolute bottom-1'}`}>DOCS</span>
+          </Link>
         </div>
       </div>
     </>

@@ -7,6 +7,7 @@ import { Radar } from './components/Radar';
 import { Profile } from './components/Profile';
 import { Camera } from './components/Camera';
 import { Tutorial } from './components/Tutorial';
+import { Whitepaper } from './components/Whitepaper';
 
 const App: React.FC = () => {
   const [showTutorial, setShowTutorial] = useState(false);
@@ -58,6 +59,7 @@ const App: React.FC = () => {
                 <Route path="/radar" element={<Radar />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/camera" element={<Camera />} />
+                <Route path="/whitepaper" element={<Whitepaper />} />
               </Routes>
               <Navigation onShowTutorial={handleShowTutorial} />
             </div>
