@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { CameraIcon, XMarkIcon, BoltIcon, ArrowPathIcon } from './Icons';
+import { useWallet } from '../contexts/WalletContext';
+import { TokenType } from '../types';
 
 interface Filter {
   name: string;
@@ -20,6 +22,7 @@ export const Camera: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const { earnToken } = useWallet();
   const [isActive, setIsActive] = useState(false);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const [flashEnabled, setFlashEnabled] = useState(false);
@@ -31,6 +34,12 @@ export const Camera: React.FC = () => {
   const [brushSize, setBrushSize] = useState(5);
   const [textOverlays, setTextOverlays] = useState<{ id: string; text: string; x: number; y: number; color: string; fontSize: number }[]>([]);
   const [showControls, setShowControls] = useState(true);
+  const [mode, setMode] = useState<'photo' | 'live' | 'call'>('photo');
+  const [isLive, setIsLive] = useState(false);
+  const [liveViewers, setLiveViewers] = useState(0);
+  const [liveTips, setLiveTips] = useState(0);
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [isMicMuted, setIsMicMuted] = useState(false);
 
   const filters: Filter[] = [
     { name: 'none', css: 'none', icon: '👁️' },
@@ -50,8 +59,9 @@ export const Camera: React.FC = () => {
       const constraints = {
         video: {
           facingMode: facingMode,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { ideal: 2560 },
+          height: { ideal: 1440 },
+          frameRate: { ideal: 60 }
         }
       };
 
@@ -208,6 +218,46 @@ export const Camera: React.FC = () => {
     setDrawingPath(prev => [...prev, { x, y }]);
   }, [isDrawing]);
 
+  // Simulate live viewer count drift while live
+  useEffect(() => {
+    if (!isLive) {
+      setLiveViewers(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setLiveViewers((prev) => {
+        const delta = Math.round((Math.random() - 0.3) * 4);
+        const next = prev + delta;
+        return next < 0 ? 0 : next;
+      });
+    }, 1500);
+    return () => clearInterval(interval);
+  }, [isLive]);
+
+  const handleStartLive = () => {
+    setMode('live');
+    setIsLive(true);
+    setLiveTips(0);
+  };
+
+  const handleEndLive = () => {
+    setIsLive(false);
+  };
+
+  const handleReceiveTip = (amount: number) => {
+    setLiveTips((prev) => prev + amount);
+    earnToken(TokenType.LOVE, amount);
+  };
+
+  const handleStartCall = () => {
+    setMode('call');
+    setIsCallActive(true);
+  };
+
+  const handleEndCall = () => {
+    setIsCallActive(false);
+  };
+
   useEffect(() => {
     if (facingMode && !isActive) {
       startCamera();
@@ -224,6 +274,27 @@ export const Camera: React.FC = () => {
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Camera View */}
       <div className="relative w-full h-screen">
+        {/* Mode tabs */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 flex bg-black/60 border border-cyber-dim rounded-full px-1 py-1 backdrop-blur-sm">
+          {[
+            { id: 'photo', label: 'Frame' },
+            { id: 'live', label: 'Live' },
+            { id: 'call', label: 'Call' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setMode(tab.id as 'photo' | 'live' | 'call')}
+              className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wide rounded-full transition-colors ${
+                mode === tab.id
+                  ? 'bg-cyber-cyan text-black'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         <video
           ref={videoRef}
           autoPlay
@@ -253,9 +324,7 @@ export const Camera: React.FC = () => {
             }
           }}
           onTouchEnd={() => {
-            if (isDrawing) {
-              setDrawingPath([]);
-            }
+            // End of stroke; keep drawingPath so the sketch persists until capture or explicit clear.
           }}
         />
 
@@ -307,6 +376,28 @@ export const Camera: React.FC = () => {
             {overlay.text}
           </div>
         ))}
+
+        {/* Live / Call HUD */}
+        {mode === 'live' && (
+          <div className="absolute top-10 left-4 z-20 flex items-center gap-3 bg-black/60 px-3 py-1 rounded-full border border-red-500/60">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-[10px] font-mono text-red-400 uppercase tracking-wide">
+              {isLive ? 'Broadcasting' : 'Standby'}
+            </span>
+            <span className="text-[10px] font-mono text-gray-300 ml-2">
+              {liveViewers} watching · {liveTips} LOVE tipped
+            </span>
+          </div>
+        )}
+
+        {mode === 'call' && (
+          <div className="absolute top-10 left-4 z-20 flex items-center gap-3 bg-black/60 px-3 py-1 rounded-full border border-cyber-cyan/60">
+            <span className="w-2 h-2 rounded-full bg-cyber-cyan animate-pulse" />
+            <span className="text-[10px] font-mono text-cyber-cyan uppercase tracking-wide">
+              {isCallActive ? 'Private Link Active' : 'Call Standby'}
+            </span>
+          </div>
+        )}
 
         {/* Controls Overlay */}
         {showControls && (
@@ -398,12 +489,40 @@ export const Camera: React.FC = () => {
               </button>
 
               {/* Capture Button */}
-              <button
-                onClick={capturePhoto}
-                className="w-16 h-16 bg-white border-4 border-white/20 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all"
-              >
-                <div className="w-12 h-12 bg-white rounded-full"></div>
-              </button>
+              {mode === 'photo' && (
+                <button
+                  onClick={capturePhoto}
+                  className="w-16 h-16 bg-white border-4 border-white/20 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all"
+                >
+                  <div className="w-12 h-12 bg-white rounded-full"></div>
+                </button>
+              )}
+
+              {mode === 'live' && (
+                <button
+                  onClick={isLive ? handleEndLive : handleStartLive}
+                  className={`w-20 h-20 rounded-full flex items-center justify-center border-4 text-[10px] font-mono uppercase tracking-wide ${
+                    isLive
+                      ? 'bg-red-600 border-red-400 text-white shadow-[0_0_25px_rgba(248,113,113,0.8)]'
+                      : 'bg-black/70 border-red-400 text-red-400 hover:bg-red-500/20'
+                  }`}
+                >
+                  {isLive ? 'End Live' : 'Go Live'}
+                </button>
+              )}
+
+              {mode === 'call' && (
+                <button
+                  onClick={isCallActive ? handleEndCall : handleStartCall}
+                  className={`w-20 h-20 rounded-full flex items-center justify-center border-4 text-[10px] font-mono uppercase tracking-wide ${
+                    isCallActive
+                      ? 'bg-cyber-cyan border-cyber-cyan text-black shadow-[0_0_25px_rgba(0,240,255,0.8)]'
+                      : 'bg-black/70 border-cyber-cyan text-cyber-cyan hover:bg-cyber-cyan/20'
+                  }`}
+                >
+                  {isCallActive ? 'End Call' : 'Start Call'}
+                </button>
+              )}
 
               {/* Brush Color */}
               <input
