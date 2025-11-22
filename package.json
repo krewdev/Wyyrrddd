@@ -10,12 +10,17 @@
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "@mlc-ai/web-llm": "^0.2.79",
     "@polkadot/api": "^16.5.2",
     "@polkadot/extension-dapp": "^0.62.5",
     "@polkadot/util": "^13.5.8",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.0",
+    "@types/three": "^0.181.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.6"
+    "react-router-dom": "^7.9.6",
+    "three": "^0.181.2"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

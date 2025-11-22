@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { WalletProvider } from './contexts/WalletContext';
 import { Navigation } from './components/Navigation';
@@ -8,6 +8,8 @@ import { Profile } from './components/Profile';
 import { Camera } from './components/Camera';
 import { Tutorial } from './components/Tutorial';
 import { Whitepaper } from './components/Whitepaper';
+import WebGPUScene from './components/WebGPUScene';
+import { NeuralInterface } from './components/NeuralInterface';
 
 const App: React.FC = () => {
   const [showTutorial, setShowTutorial] = useState(false);
@@ -38,14 +40,20 @@ const App: React.FC = () => {
   return (
     <WalletProvider>
       <Router>
-        <div className="bg-cyber-black min-h-screen font-sans text-gray-100 selection:bg-cyber-cyan selection:text-black">
-          {/* CRT Scanline Effect */}
-          <div className="scanlines"></div>
+        <div className="bg-cyber-black min-h-screen font-sans text-gray-100 selection:bg-cyber-cyan selection:text-black relative">
+          
+          {/* WebGPU Engine Layer */}
+          <Suspense fallback={<div className="fixed inset-0 bg-black" />}>
+             <WebGPUScene />
+          </Suspense>
 
-          {/* Background Grid */}
-          <div className="fixed inset-0 bg-grid-pattern bg-[length:40px_40px] opacity-10 pointer-events-none"></div>
+          {/* CRT Scanline Effect (Overlay) */}
+          <div className="scanlines pointer-events-none z-50"></div>
+          
+          {/* Local AI Interface */}
+          <NeuralInterface />
 
-          <div className="max-w-md mx-auto min-h-screen relative bg-cyber-dark/80 shadow-2xl border-x border-cyber-dim/30 backdrop-blur-sm overflow-hidden">
+          <div className="max-w-md mx-auto min-h-screen relative bg-cyber-dark/80 shadow-2xl border-x border-cyber-dim/30 backdrop-blur-sm overflow-hidden z-10">
             {/* Global Algiz watermark behind every page */}
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04] select-none">
               <span className="text-[220px] font-mono text-cyber-cyan">
