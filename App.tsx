@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { WalletProvider } from './contexts/WalletContext';
 import { Navigation } from './components/Navigation';
@@ -8,6 +8,10 @@ import { Profile } from './components/Profile';
 import { Camera } from './components/Camera';
 import { Tutorial } from './components/Tutorial';
 import { Whitepaper } from './components/Whitepaper';
+import { AmbientParticles } from './components/AmbientParticles';
+
+// Lazy load the heavy bleeding edge component
+const BleedingEdge = lazy(() => import('./components/BleedingEdge'));
 
 const App: React.FC = () => {
   const [showTutorial, setShowTutorial] = useState(false);
@@ -38,28 +42,41 @@ const App: React.FC = () => {
   return (
     <WalletProvider>
       <Router>
-        <div className="bg-cyber-black min-h-screen font-sans text-gray-100 selection:bg-cyber-cyan selection:text-black">
-          {/* CRT Scanline Effect */}
-          <div className="scanlines"></div>
-
-          {/* Background Grid */}
-          <div className="fixed inset-0 bg-grid-pattern bg-[length:40px_40px] opacity-10 pointer-events-none"></div>
-
-          <div className="max-w-md mx-auto min-h-screen relative bg-cyber-dark/80 shadow-2xl border-x border-cyber-dim/30 backdrop-blur-sm overflow-hidden">
-            {/* Global Algiz watermark behind every page */}
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04] select-none">
-              <span className="text-[220px] font-mono text-cyber-cyan">
-                ᛉ
-              </span>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300 relative">
+          {/* Ambient Particles Effect */}
+          <AmbientParticles />
+          
+          <div className="max-w-md mx-auto min-h-screen bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-xl relative overflow-hidden">
+            {/* Subtle background pattern */}
+            <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]">
+              <div className="absolute inset-0" style={{
+                backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
+                backgroundSize: '40px 40px'
+              }}></div>
             </div>
 
-            <div className="relative z-10">
+            <div className="relative z-10 flex flex-col min-h-screen">
               <Routes>
                 <Route path="/" element={<Feed />} />
                 <Route path="/radar" element={<Radar />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/camera" element={<Camera />} />
                 <Route path="/whitepaper" element={<Whitepaper />} />
+                <Route 
+                  path="/bleeding-edge" 
+                  element={
+                    <Suspense fallback={
+                      <div className="min-h-screen flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                          <p className="text-slate-600 dark:text-slate-400 font-medium">Loading WebGPU Engine...</p>
+                        </div>
+                      </div>
+                    }>
+                      <BleedingEdge />
+                    </Suspense>
+                  } 
+                />
               </Routes>
               <Navigation onShowTutorial={handleShowTutorial} />
             </div>

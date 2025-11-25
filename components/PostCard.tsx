@@ -3,6 +3,7 @@ import { Post, TokenType } from '../types';
 import { CareIcon, CreepIcon, HeartIcon, LikeIcon, ShareIcon } from './Icons';
 import { useWallet } from '../contexts/WalletContext';
 import { TokenSpendEffect, SuccessEffect } from './ParticleSystem';
+import { FloatingOrbs, Sparkles } from './FloatingOrbs';
 
 interface PostCardProps {
   post: Post;
@@ -21,6 +22,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const [localTokens, setLocalTokens] = useState(post.tokens);
   const [animations, setAnimations] = useState<{ id: string; symbol: string; isPositive: boolean; cost?: number }[]>([]);
   const [particleEffects, setParticleEffects] = useState<{ id: string; type: 'spend' | 'success'; position: { x: number; y: number } }[]>([]);
+  const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleInteraction = (type: TokenType, event: React.MouseEvent) => {
@@ -95,123 +97,128 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <div ref={cardRef} className="relative w-full bg-cyber-panel mb-8 group shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] tech-border-b">
+    <div 
+      ref={cardRef} 
+      className="relative w-full bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden group hover:shadow-2xl hover:shadow-blue-500/20 dark:hover:shadow-blue-500/40 transition-all duration-500"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Floating Orbs Background */}
+      <FloatingOrbs count={3} />
       
-      {/* Decorative Frame Elements */}
-      <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-cyber-cyan z-20"></div>
-      <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-cyber-cyan z-20"></div>
-      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyber-dim to-transparent z-20"></div>
-
-      {/* Image Container */}
-      <div className="relative w-full aspect-[4/5] overflow-hidden">
-        <img src={post.imageUrl} alt={post.caption} className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 filter contrast-110 saturate-50 group-hover:saturate-100" />
+      {/* Ambient Glow Effect */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500 -z-10" />
+      
+      {/* Sparkles on Hover */}
+      <Sparkles active={isHovered} />
+      
+      {/* Media Container */}
+      <div className="relative w-full aspect-[4/5] overflow-hidden bg-slate-100 dark:bg-slate-900">
+        {post.videoUrl ? (
+          <video
+            src={post.videoUrl}
+            controls
+            className="absolute inset-0 w-full h-full object-cover"
+            playsInline
+          />
+        ) : post.imageUrl ? (
+          <img 
+            src={post.imageUrl} 
+            alt={post.caption} 
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          />
+        ) : (
+          <div className="absolute inset-0 bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+            <span className="text-slate-400 dark:text-slate-500 text-sm">No media</span>
+          </div>
+        )}
         
-        {/* Holographic Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-cyber-black/90 z-10" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay z-10 pointer-events-none"></div>
+        {/* Video Badge */}
+        {post.videoUrl && (
+          <div className="absolute top-3 left-3">
+            <div className="bg-black/60 backdrop-blur-sm text-white px-2 py-1 text-xs font-medium rounded-lg">
+              ▶ Video
+            </div>
+          </div>
+        )}
         
-        {/* Scanline on Hover */}
-        <div className="absolute inset-0 bg-cyber-cyan/10 transform -translate-y-full group-hover:animate-scan pointer-events-none z-10"></div>
-
-        {/* Boost/Sponsored Badge */}
+        {/* Sponsored Badge */}
         {post.isSponsored && (
-          <div className="absolute top-4 right-4 z-20">
-             <div className="bg-cyber-pink/90 text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest clip-path-polygon shadow-[0_0_10px_#FF003C]">
-               Sponsored
-             </div>
+          <div className="absolute top-3 right-3">
+            <div className="bg-blue-600 text-white px-2 py-1 text-xs font-medium rounded-lg shadow-lg">
+              Sponsored
+            </div>
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="relative p-6 pt-4 bg-cyber-panel border-x border-cyber-dim/20 z-20 -mt-12 bg-gradient-to-t from-cyber-panel via-cyber-panel to-transparent">
-        
-        <div className="flex justify-between items-end mb-3 border-b border-cyber-dim/30 pb-3">
-            <div className="flex items-center space-x-3">
-                <div className="relative">
-                    <div className="absolute inset-0 rounded-full border border-cyber-cyan/50 animate-pulse"></div>
-                    <img src={post.userAvatar} alt={post.username} className="w-10 h-10 rounded-full border-2 border-cyber-dark relative z-10 bg-black" />
-                </div>
-                <div>
-                    <p className="text-cyber-cyan font-bold text-sm tracking-wide flex items-center font-mono">
-                        @{post.username}
-                    </p>
-                    <div className="flex items-center space-x-2">
-                        <span className="w-1 h-1 bg-cyber-green rounded-full"></span>
-                        <p className="text-gray-500 text-[9px] font-mono uppercase tracking-wider">ID: {post.userId.toUpperCase()}</p>
-                    </div>
-                </div>
-            </div>
-            <div className="text-[9px] font-mono text-cyber-dim text-right">
-                <div>BLK: 18,293</div>
-                <div>HASH: 0x7A...9F</div>
-            </div>
+      <div className="p-4">
+        {/* User Info */}
+        <div className="flex items-center gap-3 mb-3">
+          <img 
+            src={post.userAvatar} 
+            alt={post.username} 
+            className="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-700" 
+          />
+          <div className="flex-1">
+            <p className="font-semibold text-slate-900 dark:text-white">
+              @{post.username}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {post.userId}
+            </p>
+          </div>
         </div>
         
-        <p className="text-gray-300 text-sm mb-6 font-light leading-relaxed font-sans tracking-wide">
-            {post.caption}
+        {/* Caption */}
+        <p className="text-sm text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
+          {post.caption}
         </p>
 
-        {/* Interaction Grid */}
-        <div className="grid grid-cols-5 gap-2">
-          
-          {/* Button Component */}
+        {/* Interaction Buttons */}
+        <div className="flex items-center gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
           {[
-              { type: TokenType.LIKE, icon: LikeIcon, color: 'text-cyber-cyan', borderColor: 'border-cyber-cyan/30', rune: RUNE_MAPPING[TokenType.LIKE], label: 'LIKE' },
-              { type: TokenType.LOVE, icon: HeartIcon, color: 'text-cyber-pink', borderColor: 'border-cyber-pink/30', rune: RUNE_MAPPING[TokenType.LOVE], label: 'LOVE' },
-              { type: TokenType.CARE, icon: CareIcon, color: 'text-cyber-yellow', borderColor: 'border-cyber-yellow/30', rune: RUNE_MAPPING[TokenType.CARE], label: 'CARE' },
-              { type: TokenType.CREEP, icon: CreepIcon, color: 'text-purple-400', borderColor: 'border-purple-400/30', rune: RUNE_MAPPING[TokenType.CREEP], label: 'CREEP' }
+            { type: TokenType.LIKE, icon: LikeIcon, color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-50 dark:bg-blue-900/20', glowColor: 'shadow-blue-500/50', rune: RUNE_MAPPING[TokenType.LIKE], label: 'Like' },
+            { type: TokenType.LOVE, icon: HeartIcon, color: 'text-pink-600 dark:text-pink-400', bgColor: 'bg-pink-50 dark:bg-pink-900/20', glowColor: 'shadow-pink-500/50', rune: RUNE_MAPPING[TokenType.LOVE], label: 'Love' },
+            { type: TokenType.CARE, icon: CareIcon, color: 'text-yellow-600 dark:text-yellow-400', bgColor: 'bg-yellow-50 dark:bg-yellow-900/20', glowColor: 'shadow-yellow-500/50', rune: RUNE_MAPPING[TokenType.CARE], label: 'Care' },
+            { type: TokenType.CREEP, icon: CreepIcon, color: 'text-purple-600 dark:text-purple-400', bgColor: 'bg-purple-50 dark:bg-purple-900/20', glowColor: 'shadow-purple-500/50', rune: RUNE_MAPPING[TokenType.CREEP], label: 'Creep' }
           ].map((btn) => (
             <button
-                key={btn.type}
-                onClick={(e) => handleInteraction(btn.type, e)}
-                className={`relative flex flex-col items-center justify-center p-2 bg-cyber-black border ${btn.borderColor} rounded-sm group/btn transition-all active:scale-95 hover:bg-white/5`}
+              key={btn.type}
+              onClick={(e) => handleInteraction(btn.type, e)}
+              className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-all active:scale-95 hover:scale-105 hover:shadow-lg ${btn.glowColor} ${btn.bgColor} group/btn`}
             >
-                {/* Cost Tooltip */}
-                <div className="absolute bottom-full mb-3 px-3 py-1.5 bg-cyber-panel border border-cyber-dim text-[9px] opacity-0 group-hover/btn:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 font-mono flex flex-col items-center shadow-[0_4px_15px_rgba(0,0,0,0.5)] rounded-sm">
-                   <span className={`${btn.color} font-bold tracking-[0.1em] mb-0.5`}>{btn.label}</span>
-                   <span className="text-red-400 drop-shadow-[0_0_3px_rgba(248,113,113,0.5)]">-{tokenRates[btn.type]} DOT</span>
-                   <div className="absolute -bottom-1 w-2 h-2 bg-cyber-panel border-r border-b border-cyber-dim transform rotate-45"></div>
+              {/* Animation */}
+              {animations.filter(a => a.symbol === btn.rune).map(anim => (
+                <div key={anim.id} className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 animate-bounce">
+                  <span className={`${btn.color} font-black text-xl`}>{anim.symbol}</span>
+                  {anim.cost && (
+                    <span className="absolute top-full mt-1 text-red-500 text-xs font-bold">-{anim.cost}</span>
+                  )}
                 </div>
+              ))}
 
-                {/* Animation */}
-                {animations.filter(a => a.symbol === btn.rune).map(anim => (
-                    <div key={anim.id} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none animate-float-out z-50">
-                        <span className={`${btn.color} font-black text-2xl drop-shadow-[0_0_5px_currentColor]`}>{anim.symbol}</span>
-                        {anim.cost && (
-                            <span className="animate-spend-effect text-red-500 bg-cyber-black/90 px-1 text-[9px] font-bold font-mono border border-red-500/30 mt-1 shadow-[0_0_8px_rgba(255,0,0,0.6)]">-{anim.cost}</span>
-                        )}
-                    </div>
-                ))}
-
-                <btn.icon className={`w-5 h-5 ${btn.color} opacity-70 group-hover/btn:opacity-100 transition-opacity`} />
-                <span className="text-[8px] font-mono text-gray-500 mt-1">{localTokens[btn.type]}</span>
+              <btn.icon className={`w-5 h-5 ${btn.color}`} />
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{localTokens[btn.type]}</span>
             </button>
           ))}
 
-            {/* Share Button */}
-            <button
-                onClick={handleShare}
-                className="relative flex flex-col items-center justify-center p-2 bg-cyber-green/10 border border-cyber-green/30 rounded-sm group/btn hover:bg-cyber-green/20 transition-all"
-            >
-                {/* Share Tooltip */}
-                <div className="absolute bottom-full mb-3 px-3 py-1.5 bg-cyber-black border border-cyber-green/50 text-[9px] opacity-0 group-hover/btn:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 font-mono flex flex-col items-center shadow-[0_0_15px_rgba(57,255,20,0.3)] rounded-sm">
-                    <span className="text-cyber-green font-bold tracking-wider">SHARE POST</span>
-                    <span className="text-gray-400 text-[8px] mt-0.5">& Earn <span className="text-cyber-yellow font-bold">CARE</span></span>
-                    <div className="absolute -bottom-1 w-2 h-2 bg-cyber-black border-r border-b border-cyber-green/50 transform rotate-45"></div>
-                </div>
-
-                 {/* Enhanced Share Reward Animation */}
-                {animations.filter(a => a.symbol === 'ᛃ' && !a.cost).map(anim => (
-                    <div key={anim.id} className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-50 -translate-y-10">
-                        <div className="absolute w-16 h-16 bg-cyber-green/20 rounded-full animate-ping"></div>
-                        <span className="text-cyber-green font-black text-3xl drop-shadow-[0_0_10px_#39FF14]">{anim.symbol}</span>
-                        <span className="mt-1 text-[9px] font-black bg-cyber-green text-black px-1 rounded whitespace-nowrap">+5 CARE</span>
-                    </div>
-                ))}
-                <ShareIcon className="w-5 h-5 text-cyber-green opacity-80 group-hover/btn:opacity-100" />
-                <span className="text-[8px] font-mono text-cyber-green mt-1">SHARE</span>
-            </button>
+          {/* Share Button */}
+          <button
+            onClick={handleShare}
+            className="relative flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 hover:shadow-lg shadow-green-500/50 transition-all active:scale-95 ml-auto"
+          >
+            {/* Share Animation */}
+            {animations.filter(a => a.symbol === 'ᛃ' && !a.cost).map(anim => (
+              <div key={anim.id} className="absolute inset-0 flex items-center justify-center pointer-events-none z-50 animate-bounce">
+                <span className="text-green-600 dark:text-green-400 font-black text-xl">ᛃ</span>
+                <span className="absolute top-full mt-1 text-green-600 dark:text-green-400 text-xs font-bold">+5</span>
+              </div>
+            ))}
+            <ShareIcon className="w-5 h-5" />
+            <span className="text-sm font-medium">Share</span>
+          </button>
         </div>
       </div>
 

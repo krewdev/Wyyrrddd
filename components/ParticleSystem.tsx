@@ -223,3 +223,48 @@ export const CyberGlitchEffect: React.FC<{ active: boolean }> = ({ active }) => 
     />
   );
 };
+
+// Enhanced burst effect with more particles
+export const BurstEffect: React.FC<{ trigger: boolean; position: { x: number; y: number }; color?: string }> = ({ 
+  trigger, 
+  position,
+  color = '#3B82F6'
+}) => (
+  <ParticleSystem
+    trigger={trigger}
+    count={30}
+    colors={[color, `${color}AA`, `${color}77`]}
+    size={8}
+    speed={10}
+    lifetime={1200}
+    shape="circle"
+    gravity={0.15}
+    spread={1}
+    position={position}
+  />
+);
+
+// Confetti effect for special interactions
+export const ConfettiEffect: React.FC<{ trigger: boolean; position: { x: number; y: number } }> = ({ trigger, position }) => (
+  <ParticleSystem
+    trigger={trigger}
+    count={40}
+    colors={['#FF003C', '#FCEE0A', '#00F0FF', '#39FF14', '#FF69B4', '#9D4EDD']}
+    size={6}
+    speed={12}
+    lifetime={2000}
+    shape="square"
+    gravity={0.3}
+    spread={2}
+    position={position}
+  />
+);
+
+// Ripple effect for button presses
+export const RippleEffect: React.FC<{ active: boolean }> = ({ active }) => {
+  return active ? (
+    <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 rounded-full bg-white/30 animate-ping" />
+    </div>
+  ) : null;
+};

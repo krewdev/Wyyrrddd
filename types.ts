@@ -19,7 +19,8 @@ export interface Post {
   userId: string;
   username: string;
   userAvatar: string;
-  imageUrl: string;
+  imageUrl?: string;
+  videoUrl?: string;
   caption: string;
   tokens: {
     [key in TokenType]: number;
@@ -36,6 +37,75 @@ export interface AdLocation {
   reward: number;
   description: string;
   brand: string;
+}
+
+// Privacy-preserving location data point (never actual coordinates)
+export interface LocationDataPoint {
+  id: string;
+  zoneHash: string; // Hashed zone identifier (e.g., "grocery_store_zone_5")
+  category: string; // "grocery", "retail", "restaurant", etc.
+  timestamp: number;
+  userId?: string; // Optional, only if user opted in
+}
+
+// Geocaching Ad Campaign
+export interface GeocacheCampaign {
+  id: string;
+  advertiserId: string;
+  advertiserName: string;
+  brand: string;
+  title: string;
+  description: string;
+  targetZones: string[]; // Array of zone hashes
+  targetCategories: string[]; // Categories to target
+  targetInterests: string[]; // User interests/preferences
+  adContent: {
+    imageUrl?: string;
+    videoUrl?: string;
+    couponCode?: string;
+    discount?: string;
+    message: string;
+  };
+  reward: number; // Token reward for interaction
+  budget: number; // Total campaign budget in DOT
+  spent: number; // Amount spent so far
+  startDate: number;
+  endDate: number;
+  isActive: boolean;
+  impressions: number;
+  interactions: number;
+}
+
+// Advertiser Account
+export interface Advertiser {
+  id: string;
+  name: string;
+  brand: string;
+  walletAddress: string;
+  totalSpent: number;
+  activeCampaigns: number;
+  totalImpressions: number;
+  totalInteractions: number;
+}
+
+// Content Creator Stream to Location
+export interface CreatorStream {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  creatorAvatar: string;
+  title: string;
+  description: string;
+  streamUrl: string; // Video stream URL
+  thumbnailUrl?: string;
+  targetZones: string[]; // Array of zone hashes
+  targetCategories: string[]; // Categories to target
+  startDate: number;
+  endDate: number;
+  isActive: boolean;
+  views: number;
+  interactions: number;
+  reward: number; // Token reward for watching/interacting
 }
 
 export interface WalletState {
