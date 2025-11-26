@@ -25,7 +25,7 @@ const TECH_STACK: TechItem[] = [
   { name: 'WebGPU', category: 'Graphics', color: 'cyber-green', description: 'GPU Compute' },
   
   // AI
-  { name: 'Gemini AI', category: 'AI', color: 'cyber-yellow', description: 'Content Generation' },
+  { name: 'Perplexity AI', category: 'AI', color: 'cyber-yellow', description: 'AI Search & Q&A' },
   { name: 'Local AI', category: 'AI', color: 'cyber-green', description: 'Port 1234' },
   
   // Infrastructure

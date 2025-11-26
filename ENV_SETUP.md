@@ -2,16 +2,7 @@
 
 ## Required API Keys
 
-### 1. Gemini API Key (AI Content Generation)
-
-Get your API key from: https://makersuite.google.com/app/apikey
-
-Add to `.env.local`:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-
-### 2. Perplexity API Key (AI-Powered Search)
+### Perplexity API Key (AI-Powered Search)
 
 Get your API key from: https://www.perplexity.ai/settings/api
 
@@ -24,23 +15,19 @@ PERPLEXITY_API_KEY=your_perplexity_api_key_here
 ## Setup Instructions
 
 1. Create a file named `.env.local` in the root directory
-2. Add both API keys as shown above
+2. Add your Perplexity API key as shown above
 3. Restart your development server
 
 ## Example .env.local file
 
 ```env
-# Gemini API Key for AI-generated content
-GEMINI_API_KEY=AIzaSyC_your_actual_key_here
-
-# Perplexity API Key for AI-powered search
+# Perplexity API Key for AI-powered search and content
 VITE_PERPLEXITY_API_KEY=pplx-your_actual_key_here
 PERPLEXITY_API_KEY=pplx-your_actual_key_here
 ```
 
 ## Features Enabled
 
-- **Gemini API**: Powers AI-generated feed content
 - **Perplexity API**: Powers intelligent search with 4 modes:
   - 🔍 General Search - Search anything
   - 💡 Help - Get help with Wyyrrddd features
@@ -50,8 +37,8 @@ PERPLEXITY_API_KEY=pplx-your_actual_key_here
 ## Testing Without API Keys
 
 The app will work without API keys, but with limited functionality:
-- Gemini: Will use fallback mock content
 - Perplexity: Will show a message to add API key
+- Feed content: Will use fallback mock content
 
 ## Security Notes
 

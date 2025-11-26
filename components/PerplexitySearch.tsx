@@ -129,7 +129,7 @@ export const PerplexitySearch: React.FC = () => {
         <form onSubmit={handleSearch} className="relative">
           {/* Main Search Input */}
           <div className={`relative transition-all duration-300 ${
-            isFocused || response ? 'transform scale-100' : 'transform scale-95'
+            isFocused || response ? 'transform scale-100 opacity-100' : 'transform scale-100 opacity-10 hover:opacity-20'
           }`}>
             <div className="relative">
               {/* Glow effect */}
@@ -138,10 +138,18 @@ export const PerplexitySearch: React.FC = () => {
               }`} />
               
               {/* Search bar */}
-              <div className="relative bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden">
+              <div className={`relative backdrop-blur-xl rounded-2xl overflow-hidden transition-all duration-300 ${
+                isFocused || response
+                  ? 'bg-white/70 dark:bg-slate-900/70 shadow-2xl border border-slate-200/50 dark:border-slate-700/50'
+                  : 'bg-white/5 dark:bg-slate-900/5 shadow-none border border-slate-200/10 dark:border-slate-700/10'
+              }`}>
                 <div className="flex items-center gap-3 px-4 py-3">
                   {/* AI Icon */}
-                  <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/30">
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                    isFocused || response
+                      ? 'bg-gradient-to-br from-purple-600 to-pink-600 shadow-lg shadow-purple-500/30'
+                      : 'bg-purple-500/20 dark:bg-purple-500/10'
+                  }`}>
                     <span className="text-base">🔮</span>
                   </div>
                   
@@ -153,28 +161,34 @@ export const PerplexitySearch: React.FC = () => {
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     placeholder={currentMode.placeholder}
-                    className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none"
+                    className={`flex-1 bg-transparent text-sm focus:outline-none transition-colors duration-300 ${
+                      isFocused || response
+                        ? 'text-slate-900 dark:text-white placeholder-slate-400'
+                        : 'text-slate-400 dark:text-slate-500 placeholder-slate-300 dark:placeholder-slate-600'
+                    }`}
                     disabled={isLoading}
                   />
                   
                   {/* Mode Selector */}
-                  <div className="flex items-center gap-1">
-                    {searchModes.map((searchMode) => (
-                      <button
-                        key={searchMode.id}
-                        type="button"
-                        onClick={() => setMode(searchMode.id)}
-                        className={`p-2 rounded-lg transition-all ${
-                          mode === searchMode.id
-                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                        }`}
-                        title={searchMode.label}
-                      >
-                        <span className="text-base">{searchMode.icon}</span>
-                      </button>
-                    ))}
-                  </div>
+                  {isFocused && (
+                    <div className="flex items-center gap-1">
+                      {searchModes.map((searchMode) => (
+                        <button
+                          key={searchMode.id}
+                          type="button"
+                          onClick={() => setMode(searchMode.id)}
+                          className={`p-2 rounded-lg transition-all ${
+                            mode === searchMode.id
+                              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                              : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          }`}
+                          title={searchMode.label}
+                        >
+                          <span className="text-base">{searchMode.icon}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   
                   {/* Search/Clear Button */}
                   {query && !isLoading ? (
@@ -197,31 +211,24 @@ export const PerplexitySearch: React.FC = () => {
             </div>
           </div>
 
-          {/* Floating Example Queries */}
+          {/* Floating Example Queries - Text Only */}
           {showExamples && !response && (
-            <div className="absolute bottom-full left-0 right-0 mb-3 space-y-2 animate-fadeIn">
+            <div className="absolute bottom-full left-0 right-0 mb-2 space-y-1 animate-fadeIn">
               {exampleQueries.map((example, index) => (
                 <button
                   key={index}
                   type="button"
                   onClick={() => handleExampleClick(example)}
-                  className="w-full text-left px-4 py-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-xl shadow-lg border border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl transition-all duration-300 hover:scale-105 group"
+                  className="w-full text-left px-2 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-200 hover:translate-x-1 group"
                   style={{
-                    animationDelay: `${index * 50}ms`,
+                    animationDelay: `${index * 30}ms`,
                     animationFillMode: 'backwards'
                   }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`flex-shrink-0 w-8 h-8 bg-gradient-to-r ${example.color} rounded-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                      <span className="text-sm">{example.icon}</span>
-                    </div>
-                    <span className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
-                      {example.text}
-                    </span>
-                    <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
+                  <span className="inline-block mr-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                    {example.icon}
+                  </span>
+                  <span>{example.text}</span>
                 </button>
               ))}
             </div>

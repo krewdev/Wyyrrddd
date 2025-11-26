@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { analyzeSurroundings } from '../services/geminiService';
+import { generateGeoAd } from '../services/perplexityService';
 import { useWallet } from '../contexts/WalletContext';
 import { TokenType } from '../types';
 import { RadarIcon } from './Icons';
@@ -26,10 +26,10 @@ export const Radar: React.FC = () => {
         const isAd = Math.random() > 0.3;
         
         if (isAd) {
-             const analysis = await analyzeSurroundings(lat, lng);
+             const analysis = await generateGeoAd(lat, lng);
              const parts = analysis.split(':');
-             const brand = parts.length > 1 ? parts[0] : 'Unknown Source';
-             const msg = parts.length > 1 ? parts[1] : analysis;
+             const brand = parts.length > 1 ? parts[0].trim() : 'Unknown Source';
+             const msg = parts.length > 1 ? parts.slice(1).join(':').trim() : analysis;
 
              setFoundTarget({
                  type: 'BROADCAST',

@@ -161,23 +161,27 @@ if ('serviceWorker' in navigator) {
 
 ### Required Variables
 ```env
-GEMINI_API_KEY=your_gemini_api_key_here
+VITE_PERPLEXITY_API_KEY=your_perplexity_api_key_here
+PERPLEXITY_API_KEY=your_perplexity_api_key_here
 ```
 
 ### Platform-Specific Setup
 
 **Vercel**:
 ```bash
-vercel env add GEMINI_API_KEY
+vercel env add VITE_PERPLEXITY_API_KEY
+vercel env add PERPLEXITY_API_KEY
 ```
 
 **Netlify**:
 - Dashboard → Site Settings → Environment Variables
-- Add `GEMINI_API_KEY`
+- Add `VITE_PERPLEXITY_API_KEY`
+- Add `PERPLEXITY_API_KEY`
 
 **Cloudflare Pages**:
 - Dashboard → Settings → Environment Variables
-- Add `GEMINI_API_KEY`
+- Add `VITE_PERPLEXITY_API_KEY`
+- Add `PERPLEXITY_API_KEY`
 
 ---
 

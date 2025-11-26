@@ -140,5 +140,39 @@ export async function explainConcept(concept: string): Promise<string> {
   );
 }
 
+/**
+ * Generate contextual ad messages based on location
+ */
+export async function generateGeoAd(lat: number, lng: number): Promise<string> {
+  const apiKey = import.meta.env.VITE_PERPLEXITY_API_KEY || process.env.PERPLEXITY_API_KEY;
+
+  if (!apiKey) {
+    // Fallback to mock ads if no API key
+    const mockAds = [
+      'CryptoExchange: Trade DOT with zero fees for the next 24 hours!',
+      'Web3Wallet: Secure your crypto assets with military-grade encryption.',
+      'NFTMarketplace: Discover exclusive Polkadot NFT drops near you.',
+      'DeFiProtocol: Earn up to 15% APY on your DOT holdings.',
+      'BlockchainCafe: First Web3 café in your area - Pay with crypto!'
+    ];
+    return mockAds[Math.floor(Math.random() * mockAds.length)];
+  }
+
+  try {
+    const result = await queryPerplexity(
+      `Generate a short, engaging advertisement message (brand name followed by colon, then message) for a Web3/crypto business that could be targeting users near coordinates ${lat}, ${lng}. Keep it under 100 characters total. Format: "BrandName: Message"`,
+      'You are a creative advertising copywriter for Web3 and blockchain companies. Create concise, engaging ad messages.'
+    );
+    return result;
+  } catch (error) {
+    // Fallback to mock ad on error
+    const mockAds = [
+      'CryptoExchange: Trade DOT with zero fees for the next 24 hours!',
+      'Web3Wallet: Secure your crypto assets with military-grade encryption.',
+      'NFTMarketplace: Discover exclusive Polkadot NFT drops near you.'
+    ];
+    return mockAds[Math.floor(Math.random() * mockAds.length)];
+  }
+}
 
 

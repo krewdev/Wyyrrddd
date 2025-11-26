@@ -29,7 +29,6 @@ A next-generation decentralized social network built on Polkadot with tokenized 
 
 2. **Set up environment:**
    - Create `.env.local` file
-   - Add your `GEMINI_API_KEY` for AI-generated content
    - Add your `PERPLEXITY_API_KEY` for AI search (see [ENV_SETUP.md](./ENV_SETUP.md))
 
 3. **Start development server:**
@@ -50,7 +49,7 @@ See [VISUAL_FEATURES_GUIDE.md](./VISUAL_FEATURES_GUIDE.md) for a complete guide 
 - **Blockchain**: Polkadot.js, Substrate
 - **Styling**: TailwindCSS, Custom CSS Animations
 - **3D Graphics**: Three.js, React Three Fiber
-- **AI**: Google Gemini API
+- **AI**: Perplexity AI
 - **Build**: Vite
 
 ## 📚 Documentation
