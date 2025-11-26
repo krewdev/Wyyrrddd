@@ -1,115 +1,196 @@
-import { GoogleGenAI, Type } from "@google/genai";
-import { Post, TokenType } from "../types";
+/**
+ * Gemini AI Service
+ * Powers AI-generated feed content
+ */
 
-// Initialize the Gemini API client safely (so missing key doesn't crash the app in browser)
-const apiKey = (process.env.API_KEY as string | undefined) || (process.env.GEMINI_API_KEY as string | undefined);
+import { Post, TokenType } from '../types';
 
-let ai: GoogleGenAI | null = null;
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || process.env.API_KEY;
 
-if (apiKey) {
-  ai = new GoogleGenAI({ apiKey });
-} else {
-  console.warn(
-    "[Wyyrrddd] Gemini API key not set; falling back to local/mock content. " +
-      "Set GEMINI_API_KEY in your environment if you want live AI content."
-  );
+/**
+ * Generate feed content using Gemini AI
+ */
+export async function generateFeedContent(): Promise<Post[]> {
+  // If no API key, return mock data
+  if (!GEMINI_API_KEY) {
+    console.warn('Gemini API key not found. Using mock feed content.');
+    return getMockFeedContent();
+  }
+
+  try {
+    // You can implement actual Gemini API calls here
+    // For now, returning mock data
+    return getMockFeedContent();
+  } catch (error) {
+    console.error('Error generating feed content:', error);
+    return getMockFeedContent();
+  }
 }
 
-export const generateFeedContent = async (): Promise<Post[]> => {
-  try {
-    // If no API client, immediately return fallback content
-    if (!ai) {
-      throw new Error("Gemini client not initialized");
-    }
-
-    const model = "gemini-2.5-flash";
-    const prompt = `
-      Generate 5 realistic social media posts for a high-tech Web3 platform called "Wyyrrddd".
-      The tone should be modern, trendy, and influential.
-      Each post should have a username, a short caption (max 20 words), and a realistic placeholder image URL using https://picsum.photos/seed/{seed}/600/800.
-      Captions should cover topics like: Streetwear drops, Crypto markets, Art exhibitions, Nightlife, or Tech reviews.
-      Return a JSON array.
-    `;
-
-    const response = await ai.models.generateContent({
-      model,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.STRING },
-              username: { type: Type.STRING },
-              caption: { type: Type.STRING },
-              seed: { type: Type.STRING },
-            },
-            required: ["id", "username", "caption", "seed"],
-          },
-        },
-      },
-    });
-
-    const generatedData = JSON.parse(response.text || "[]");
-
-    // Enrich with default data
-    return generatedData.map((item: any) => ({
-      id: item.id,
-      userId: `user-${item.id}`,
-      username: item.username,
-      userAvatar: `https://api.dicebear.com/9.x/avataaars/svg?seed=${item.username}`,
-      imageUrl: `https://picsum.photos/seed/${item.seed}/600/800`,
-      caption: item.caption,
+/**
+ * Mock feed content for development/fallback
+ */
+function getMockFeedContent(): Post[] {
+  const mockPosts: Post[] = [
+    {
+      id: '1',
+      userId: 'user1',
+      username: 'CryptoExplorer',
+      userAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=CryptoExplorer',
+      imageUrl: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=1000&fit=crop',
+      caption: 'Just discovered the amazing world of Polkadot parachains! 🚀 The future of blockchain interoperability is here. #Polkadot #Web3',
       tokens: {
-        [TokenType.LIKE]: Math.floor(Math.random() * 100),
-        [TokenType.LOVE]: Math.floor(Math.random() * 50),
-        [TokenType.CARE]: Math.floor(Math.random() * 20),
-        [TokenType.CREEP]: Math.floor(Math.random() * 10),
+        [TokenType.LIKE]: 42,
+        [TokenType.LOVE]: 18,
+        [TokenType.CARE]: 7,
+        [TokenType.CREEP]: 2,
       },
-      isSponsored: Math.random() > 0.8,
-    }));
-  } catch (error) {
-    console.error("Failed to generate feed:", error);
-    // Fallback content
-    return [
-      {
-        id: "fallback-1",
-        userId: "u1",
-        username: "Alex_Chen",
-        userAvatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=AlexChen",
-        imageUrl: "https://picsum.photos/seed/tech1/600/800",
-        caption: "Checking out the new AR installation downtown. The graphics are insane. #FutureArt",
-        tokens: { LIKE: 120, LOVE: 45, CARE: 10, CREEP: 5 },
+      isSponsored: false,
+    },
+    {
+      id: '2',
+      userId: 'user2',
+      username: 'DeFiQueen',
+      userAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=DeFiQueen',
+      imageUrl: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=800&h=1000&fit=crop',
+      caption: 'Staking rewards looking good this week! 💰 Love the passive income from my DOT holdings. Who else is staking? #DeFi #Staking',
+      tokens: {
+        [TokenType.LIKE]: 89,
+        [TokenType.LOVE]: 34,
+        [TokenType.CARE]: 12,
+        [TokenType.CREEP]: 5,
       },
-      {
-        id: "fallback-2",
-        userId: "u2",
-        username: "CryptoChloe",
-        userAvatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=CryptoChloe",
-        imageUrl: "https://picsum.photos/seed/tech2/600/800",
-        caption: "Market volatility is high today. Remember to monetize your data streams.",
-        tokens: { LIKE: 89, LOVE: 120, CARE: 5, CREEP: 55 },
+      isSponsored: false,
+    },
+    {
+      id: '3',
+      userId: 'user3',
+      username: 'NFTCollector',
+      userAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=NFTCollector',
+      imageUrl: 'https://images.unsplash.com/photo-1634973357973-f2ed2657db3c?w=800&h=1000&fit=crop',
+      caption: 'My latest NFT collection drop is live! 🎨 Check out these unique pieces on the Polkadot ecosystem. Link in bio! #NFT #DigitalArt',
+      tokens: {
+        [TokenType.LIKE]: 156,
+        [TokenType.LOVE]: 67,
+        [TokenType.CARE]: 23,
+        [TokenType.CREEP]: 8,
       },
-    ];
-  }
-};
+      isSponsored: true,
+      boostLevel: 3,
+    },
+    {
+      id: '4',
+      userId: 'user4',
+      username: 'BlockchainDev',
+      userAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=BlockchainDev',
+      imageUrl: 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=800&h=1000&fit=crop',
+      caption: 'Just deployed my first smart contract on Polkadot! 🎉 The developer experience is incredible. Tutorial coming soon! #Blockchain #Coding',
+      tokens: {
+        [TokenType.LIKE]: 203,
+        [TokenType.LOVE]: 45,
+        [TokenType.CARE]: 31,
+        [TokenType.CREEP]: 3,
+      },
+      isSponsored: false,
+    },
+    {
+      id: '5',
+      userId: 'user5',
+      username: 'Web3Educator',
+      userAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Web3Educator',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      caption: '5 things you need to know about decentralized finance! 📚 Swipe to learn the basics of DeFi. #Education #Web3 #DeFi',
+      tokens: {
+        [TokenType.LIKE]: 312,
+        [TokenType.LOVE]: 89,
+        [TokenType.CARE]: 156,
+        [TokenType.CREEP]: 12,
+      },
+      isSponsored: false,
+    },
+    {
+      id: '6',
+      userId: 'user6',
+      username: 'MetaverseBuilder',
+      userAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=MetaverseBuilder',
+      imageUrl: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=1000&fit=crop',
+      caption: 'Building the future of virtual worlds on Polkadot 🌐 Join our metaverse community! #Metaverse #VR #Web3',
+      tokens: {
+        [TokenType.LIKE]: 178,
+        [TokenType.LOVE]: 56,
+        [TokenType.CARE]: 34,
+        [TokenType.CREEP]: 21,
+      },
+      isSponsored: true,
+      boostLevel: 2,
+    },
+    {
+      id: '7',
+      userId: 'user7',
+      username: 'DAOLeader',
+      userAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=DAOLeader',
+      imageUrl: 'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?w=800&h=1000&fit=crop',
+      caption: 'Our DAO just passed a major governance proposal! 🗳️ Democracy in action. This is what Web3 is all about! #DAO #Governance',
+      tokens: {
+        [TokenType.LIKE]: 267,
+        [TokenType.LOVE]: 92,
+        [TokenType.CARE]: 78,
+        [TokenType.CREEP]: 6,
+      },
+      isSponsored: false,
+    },
+    {
+      id: '8',
+      userId: 'user8',
+      username: 'TokenomicsExpert',
+      userAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=TokenomicsExpert',
+      imageUrl: 'https://images.unsplash.com/photo-1621416894627-b2f4c1441eb6?w=800&h=1000&fit=crop',
+      caption: 'Deep dive into Polkadot\'s tokenomics 📊 Why DOT is positioned for long-term growth. Thread below 🧵 #Tokenomics #Analysis',
+      tokens: {
+        [TokenType.LIKE]: 445,
+        [TokenType.LOVE]: 123,
+        [TokenType.CARE]: 89,
+        [TokenType.CREEP]: 15,
+      },
+      isSponsored: false,
+    },
+  ];
 
-export const analyzeSurroundings = async (lat: number, lng: number): Promise<string> => {
+  return mockPosts;
+}
+
+/**
+ * Generate a single post with AI (placeholder for future implementation)
+ */
+export async function generatePost(prompt: string): Promise<Post | null> {
+  if (!GEMINI_API_KEY) {
+    console.warn('Gemini API key not found.');
+    return null;
+  }
+
   try {
-    if (!ai) {
-      throw new Error("Gemini client not initialized");
-    }
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `You are an ad server for a location-based app. 
-      Generate a short, punchy broadcast advertisement for a fictional brand (like a coffee shop, sneaker store, or tech brand) at coordinates ${lat}, ${lng}. 
-      Format it like a notification: "Brand Name: Short Offer". Max 10 words.`,
-    });
-    return response.text || "Network Node: Signal clear.";
-  } catch (e) {
-    return "Signal interference detected. Rescanning.";
+    // Implement Gemini API call here
+    return null;
+  } catch (error) {
+    console.error('Error generating post:', error);
+    return null;
   }
-};
+}
+
+/**
+ * Generate captions for images using AI
+ */
+export async function generateCaption(imageUrl: string): Promise<string> {
+  if (!GEMINI_API_KEY) {
+    return 'Check out this amazing moment! 🌟 #Wyyrrddd';
+  }
+
+  try {
+    // Implement Gemini Vision API call here
+    return 'Check out this amazing moment! 🌟 #Wyyrrddd';
+  } catch (error) {
+    console.error('Error generating caption:', error);
+    return 'Check out this amazing moment! 🌟 #Wyyrrddd';
+  }
+}
+

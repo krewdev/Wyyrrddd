@@ -1,5 +1,7 @@
 # Visual Enhancements Summary
 
+🌐 **Live at**: [wyyrrddd.fun](https://wyyrrddd.fun)
+
 ## Overview
 This document outlines all the visual and interactive enhancements made to the Wyyrrddd application.
 

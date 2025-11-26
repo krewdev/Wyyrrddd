@@ -9,6 +9,7 @@ import { Camera } from './components/Camera';
 import { Tutorial } from './components/Tutorial';
 import { Whitepaper } from './components/Whitepaper';
 import { AmbientParticles } from './components/AmbientParticles';
+import { PerplexitySearch } from './components/PerplexitySearch';
 
 // Lazy load the heavy bleeding edge component
 const BleedingEdge = lazy(() => import('./components/BleedingEdge'));
@@ -88,6 +89,9 @@ const App: React.FC = () => {
             onClose={() => setShowTutorial(false)}
             onComplete={handleTutorialComplete}
           />
+
+          {/* Perplexity AI Search */}
+          <PerplexitySearch />
         </div>
       </Router>
     </WalletProvider>

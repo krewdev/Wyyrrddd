@@ -1,8 +1,19 @@
 # Visual Features Quick Start Guide
 
+🌐 **Live at**: [wyyrrddd.fun](https://wyyrrddd.fun)
+
 ## 🎨 What's New?
 
-Your Wyyrrddd app now has amazing visual enhancements with:
+Your Wyyrrddd app now has amazing visual enhancements and AI-powered features:
+
+### 🔮 **AI-Powered Search (NEW!)**
+- **Perplexity AI Integration** for intelligent search and Q&A
+- **4 Search Modes**: General, Help, Web3, and Explain
+- **Floating Search Button** with purple/pink gradient
+- **Real-time Answers** from the latest information
+- See [PERPLEXITY_GUIDE.md](./PERPLEXITY_GUIDE.md) for details
+
+### ✨ **Visual Enhancements**
 
 ### ✨ Multiple Scrolling Modes
 
@@ -53,6 +64,17 @@ Your Wyyrrddd app now has amazing visual enhancements with:
 - Floating animations
 
 ## 🚀 How to Use
+
+### Use AI Search (NEW!)
+
+1. **Look at the top center** of the screen - see the floating AI search bar
+2. **Click the search bar** to see 6 example queries float out beautifully
+3. **Choose a mode**: 🔍 Search, 💡 Help, ⛓️ Web3, or 📚 Explain
+4. **Click an example** or type your own question:
+   - "What is Polkadot?"
+   - "How do I use carousel mode?"
+   - "Explain smart contracts"
+5. **Get instant AI-powered answers!**
 
 ### Switch View Modes
 1. Look for the view mode toggle below the search bar

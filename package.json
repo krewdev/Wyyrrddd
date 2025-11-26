@@ -1,7 +1,9 @@
 {
   "name": "wyyrrddd",
+  "version": "2.1.0",
+  "description": "Decentralized Social Network on Polkadot",
+  "homepage": "https://wyyrrddd.fun",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,0 +1,13 @@
+# robots.txt for wyyrrddd.fun
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://wyyrrddd.fun/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
+
+
+

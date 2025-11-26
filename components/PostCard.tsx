@@ -81,18 +81,20 @@ export const PostCard: React.FC<PostCardProps> = ({ post }) => {
        setParticleEffects(prev => prev.filter(p => p.id !== id));
     }, 1000);
 
+    const shareUrl = `https://wyyrrddd.fun/post/${post.id}`;
+    
     if (navigator.share) {
       try {
         await navigator.share({
           title: `Wyyrrddd: @${post.username}`,
           text: post.caption,
-          url: window.location.href
+          url: shareUrl
         });
       } catch (err) {
         console.log('Share cancelled');
       }
     } else {
-      navigator.clipboard.writeText(`${post.caption} - via Wyyrrddd`);
+      navigator.clipboard.writeText(`${post.caption}\n\nCheck it out on Wyyrrddd: ${shareUrl}`);
     }
   };
 
