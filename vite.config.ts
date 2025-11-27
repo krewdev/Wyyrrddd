@@ -21,17 +21,31 @@ export default defineConfig(({ mode }) => {
       build: {
         rollupOptions: {
           output: {
-            manualChunks: {
+            manualChunks: (id) => {
+              // Ensure React is in a single chunk to prevent multiple instances
+              if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+                return 'react-vendor';
+              }
               // Split Three.js and related 3D libraries into separate chunk
-              'three': ['three', '@react-three/fiber', '@react-three/drei'],
+              if (id.includes('node_modules/three') || 
+                  id.includes('node_modules/@react-three')) {
+                return 'three';
+              }
               // Split Polkadot libraries
-              'polkadot': ['@polkadot/api', '@polkadot/extension-dapp', '@polkadot/util'],
-              // Keep React and core router together
-              'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+              if (id.includes('node_modules/@polkadot')) {
+                return 'polkadot';
+              }
+              // Keep router with React
+              if (id.includes('node_modules/react-router')) {
+                return 'react-vendor';
+              }
             }
           }
         },
         chunkSizeWarningLimit: 1000, // Increase limit since we're splitting properly
+      },
+      optimizeDeps: {
+        include: ['react', 'react-dom', 'react-router-dom'],
       }
     };
 });
